@@ -5,13 +5,15 @@ import { TAppState } from "../../../Services/Config/Store";
 interface IInitialState {
   searchValue: string;
   isSearching: boolean;
-  tracks: any[];
+  tracks: SpotifyApi.TrackObjectFull[];
+  hasError: boolean;
 }
 
 const initialState: IInitialState = {
   searchValue: "",
   isSearching: false,
   tracks: [],
+  hasError: false,
 };
 
 const searchSlice = createSlice({
@@ -24,7 +26,10 @@ const searchSlice = createSlice({
     setIsSearching: (state, action: PayloadAction<boolean>) => {
       return { ...state, isSearching: action.payload };
     },
-    setTracks: (state, action: PayloadAction<unknown[]>) => {
+    setHasError: (state, action: PayloadAction<boolean>) => {
+      return { ...state, hasError: action.payload };
+    },
+    setTracks: (state, action: PayloadAction<SpotifyApi.TrackObjectFull[]>) => {
       return { ...state, tracks: action.payload };
     },
   },
@@ -33,6 +38,7 @@ const searchSlice = createSlice({
 export const {
   setSearchValue,
   setIsSearching,
+  setHasError,
   setTracks,
 } = searchSlice.actions;
 export const selectSearch = (state: TAppState) => state.search;

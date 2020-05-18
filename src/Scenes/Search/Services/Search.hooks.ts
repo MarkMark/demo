@@ -1,32 +1,38 @@
 import {
   selectSearch,
+  setHasError,
   setIsSearching,
   setSearchValue,
   setTracks,
 } from "./Search.Redux";
 import { useDispatch, useSelector } from "react-redux";
 
+import { selectAuth } from "../../Auth/Services/Auth.Redux";
+import spotifyApi from "../../../Services/Config/shopify";
 import { useDebounce } from "../../../Services/Hooks/useDebounce";
 import { useEffect } from "react";
 
-export function useSearch(token: string) {
-  const { searchValue, isSearching, tracks } = useSelector(selectSearch);
+export function useSearch() {
+  const { token } = useSelector(selectAuth);
+  const { searchValue, isSearching, tracks, hasError } = useSelector(
+    selectSearch
+  );
   const debouncedSearchValue = useDebounce(searchValue, 250);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(setHasError(false));
+
     if (debouncedSearchValue) {
-      fetch(
-        `https://api.spotify.com/v1/search?q=${debouncedSearchValue}&type=track`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-        .then((response) => response.json())
+      dispatch(setIsSearching(true));
+
+      spotifyApi
+        .searchTracks(debouncedSearchValue)
         .then((res) => dispatch(setTracks(res.tracks.items ?? [])))
-        .catch((err) => console.error(err))
+        .catch((err) => {
+          console.error(err);
+          dispatch(setHasError(true));
+        })
         .finally(() => dispatch(setIsSearching(false)));
     } else {
       dispatch(setIsSearching(false));
@@ -34,27 +40,11 @@ export function useSearch(token: string) {
     }
   }, [debouncedSearchValue, dispatch, token]);
 
-  // const spotify = new SpotifyWebApi();
-  // const dispatch = useDispatch();
-  // spotify.setAccessToken(token);
-
-  // const search = function (value: string) {
-  //   fetch(`https://api.spotify.com/v1/search?q=${value}&type=track`, {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then(({ tracks }) => dispatch(setTracks(tracks.items)));
-  //   // spotify
-  //   //   .searchTracks(value, { limit: 5 })
-  //   //   .then(({ tracks }) => setTracks(() => tracks.items));
-  // };
-
   return {
     searchValue,
     setSearchValue: (value: string) => dispatch(setSearchValue(value)),
     isSearching,
+    hasError,
     tracks,
   };
 }
