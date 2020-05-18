@@ -1,37 +1,31 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
-import Playlist from "../Playlist/Playlist";
-import Search from "../Search/Search";
+import { Box } from "../../Components/Layout/Box";
+import { Link } from "rendition";
 import { setId } from "./Services/User.Redux";
 import { setToken } from "./Services/Auth.Redux";
+import spotifyApi from "../../Services/Config/shopify";
 import { useDispatch } from "react-redux";
+import { useHash } from "./Services/Auth.Hooks";
+import { useHistory } from "react-router-dom";
 
-export const authEndpoint = "https://accounts.spotify.com/authorize";
+const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "821d49a1de184a378e845316ab86f438";
 const redirectUri = "http://localhost:3000/";
 const scopes = ["playlist-modify-public", "user-read-private"];
 
-// Get the hash of the url
-const hash = window.location.hash
-  .substring(1)
-  .split("&")
-  .reduce(function (initial: any, item) {
-    if (item) {
-      var parts = item.split("=");
-      initial[parts[0]] = decodeURIComponent(parts[1]);
-    }
-    return initial;
-  }, {});
-
-window.location.hash = "";
-
 export default function Login() {
-  const [token] = useState(hash.access_token);
+  const history = useHistory();
+  const { hashData } = useHash();
+  const token = hashData?.access_token;
   const dispatch = useDispatch();
 
+  // Handle the login if token is present
   useEffect(() => {
     if (token) {
       dispatch(setToken(token));
+
+      spotifyApi.setAccessToken(token);
 
       fetch(`https://api.spotify.com/v1/me`, {
         headers: {
@@ -39,30 +33,25 @@ export default function Login() {
         },
       })
         .then((response) => response.json())
-        .then((res) => dispatch(setId(res.id)))
+        .then((res) => {
+          dispatch(setId(res.id));
+          history.push("/search");
+        })
         .catch((err) => console.error(err));
     }
-  }, [dispatch, token]);
+  }, [dispatch, token, history]);
 
   return (
-    <div>
-      {!token && (
-        <a
-          className="btn btn--loginApp-link"
-          href={`https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
+    <Box textAlign="center" padding="32px">
+      {!hashData?.access_token && (
+        <Link
+          href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
             ","
           )}&response_type=token`}
         >
           Login to Spotify
-        </a>
+        </Link>
       )}
-
-      {token && (
-        <Fragment>
-          <Search token={token} />
-          <Playlist />
-        </Fragment>
-      )}
-    </div>
+    </Box>
   );
 }

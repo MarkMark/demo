@@ -1,33 +1,81 @@
-import React from "react";
-import { setTrack } from "../Playlist/Services/Playlist.Redux";
-import { useDispatch } from "react-redux";
+import React, { useEffect } from "react";
+import {
+  selectPlaylist,
+  setIsAddPlaylistOpen,
+  setTrack,
+} from "./Services/Playlist.Redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Box } from "../../Components/Layout/Box";
+import FormPlaylist from "./Components/FormPlaylist";
+import { Input } from "rendition";
+import PlaylistSidebar from "./Components/PlaylistSidebar";
+import { selectAuth } from "../Auth/Services/Auth.Redux";
+import { useHistory } from "react-router-dom";
+import { usePlaylist } from "./Services/Playlist.hooks";
 import { useSearch } from "./Services/Search.hooks";
 
-interface ISearch {
-  token: string;
-}
-
-export default function Search({ token }: ISearch) {
-  const { searchValue, tracks, setSearchValue } = useSearch(token);
+export default function Search() {
+  const {
+    searchValue,
+    tracks,
+    setSearchValue,
+    hasError,
+    isSearching,
+  } = useSearch();
+  const { playlistData } = usePlaylist();
+  const { isAddPlaylistOpen } = useSelector(selectPlaylist);
+  const { token } = useSelector(selectAuth);
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (!token) history.push("/");
+  }, [history, token]);
 
   return (
-    <div>
-      <input
-        type="text"
-        value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
-      />
+    <Box display="flex">
+      <Box padding="32px" flex="1">
+        <Input
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="search"
+          mb="16px"
+        />
 
-      {!!tracks.length &&
-        tracks.map((track, i) => (
-          <div key={track.id ?? i}>
-            {/* TODO: Check that a playlist exists */}
-            <button onClick={() => dispatch(setTrack(track))}>
-              {track.name}
-            </button>
-          </div>
-        ))}
-    </div>
+        {(() => {
+          if (isSearching) return "Loading";
+
+          if (hasError) return "Unable to return the list at this time";
+
+          if (tracks.length)
+            return tracks.map((track, i) => (
+              <Box
+                key={track.id ?? i}
+                display="flex"
+                justifyContent="space-between"
+              >
+                {track.name}
+                {/* TODO: Check that a playlist exists */}
+                <button
+                  onClick={() => {
+                    if (!playlistData) {
+                      dispatch(setIsAddPlaylistOpen(true));
+                    }
+
+                    dispatch(setTrack(track));
+                  }}
+                >
+                  add to playlist
+                </button>
+              </Box>
+            ));
+        })()}
+      </Box>
+
+      <PlaylistSidebar />
+
+      {isAddPlaylistOpen && <FormPlaylist />}
+    </Box>
   );
 }
