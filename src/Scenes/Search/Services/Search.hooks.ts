@@ -8,7 +8,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectAuth } from "../../Auth/Services/Auth.Redux";
-import spotifyApi from "../../../Services/Config/shopify";
+import spotifyApi from "../../../Services/Config/spotify";
 import { useDebounce } from "../../../Services/Hooks/useDebounce";
 import { useEffect } from "react";
 

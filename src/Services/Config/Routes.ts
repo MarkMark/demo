@@ -3,13 +3,14 @@ import Search from "../../Scenes/Search/Search";
 
 export const routes = [
   {
-    path: ["", "/login"],
+    path: ["/login"],
     component: Login,
     exact: true,
   },
   {
-    path: "/search",
+    path: ["", "/search"],
     component: Search,
     exact: true,
+    isPrivate: true,
   },
 ];

@@ -10,7 +10,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectUser } from "../../Auth/Services/User.Redux";
-import spotifyApi from "../../../Services/Config/shopify";
+import spotifyApi from "../../../Services/Config/spotify";
 import { toast } from "react-toastify";
 
 export function usePlaylist() {

@@ -1,13 +1,10 @@
-import React, { useEffect } from "react";
-
 import { Box } from "../../Components/Layout/Box";
 import { Link } from "rendition";
-import { setId } from "./Services/User.Redux";
-import { setToken } from "./Services/Auth.Redux";
-import spotifyApi from "../../Services/Config/shopify";
-import { useDispatch } from "react-redux";
-import { useHash } from "./Services/Auth.Hooks";
-import { useHistory } from "react-router-dom";
+import React from "react";
+import { selectUser } from "./Services/User.Redux";
+import { useAuth } from "./Services/Auth.Hooks";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const authEndpoint = "https://accounts.spotify.com/authorize";
 const clientId = "821d49a1de184a378e845316ab86f438";
@@ -15,35 +12,27 @@ const redirectUri = "http://localhost:3000/";
 const scopes = ["playlist-modify-public", "user-read-private"];
 
 export default function Login() {
-  const history = useHistory();
-  const { hashData } = useHash();
-  const token = hashData?.access_token;
-  const dispatch = useDispatch();
+  const location = useLocation();
+  const hash = location.hash;
+  console.log(hash);
+  const { token, getToken, storeToken } = useAuth();
+  const { id } = useSelector(selectUser);
 
-  // Handle the login if token is present
-  useEffect(() => {
-    if (token) {
-      dispatch(setToken(token));
+  // useEffect(() => {
+  //   console.log("hash", hash);
+  //   // if (hash) getToken(hash);
+  // }, [getToken, hash]);
 
-      spotifyApi.setAccessToken(token);
-
-      fetch(`https://api.spotify.com/v1/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          dispatch(setId(res.id));
-          history.push("/search");
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [dispatch, token, history]);
+  // useEffect(() => {
+  //   console.log("token", token);
+  //   if (token && !id) {
+  //     // storeToken();
+  //   }
+  // }, [storeToken, id, token]);
 
   return (
     <Box textAlign="center" padding="32px">
-      {!hashData?.access_token && (
+      {!token && (
         <Link
           href={`${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
             ","
