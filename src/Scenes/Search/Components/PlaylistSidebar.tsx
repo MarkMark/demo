@@ -6,7 +6,13 @@ import { useDispatch } from "react-redux";
 import { usePlaylist } from "../Services/Playlist.hooks";
 
 export default function PlaylistSidebar() {
-  const { playlistData, tracks, exportPlaylist } = usePlaylist();
+  const {
+    playlistData,
+    tracks,
+    exportPlaylist,
+    isLoading,
+    isUploaded,
+  } = usePlaylist();
   const dispatch = useDispatch();
 
   return (
@@ -16,7 +22,10 @@ export default function PlaylistSidebar() {
           if (playlistData) return <h3>{playlistData.name} playlist</h3>;
 
           return (
-            <Button onClick={() => dispatch(setIsAddPlaylistOpen(true))}>
+            <Button
+              disabled={isLoading || isUploaded}
+              onClick={() => dispatch(setIsAddPlaylistOpen(true))}
+            >
               Create a playlist
             </Button>
           );

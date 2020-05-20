@@ -1,32 +1,71 @@
-import { selectPlaylist } from "./Playlist.Redux";
+import {
+  IForm,
+  selectPlaylist,
+  setHasError,
+  setIsLoading,
+  setIsUploaded,
+  setPlaylistData,
+  setTrack,
+} from "./Playlist.Redux";
+import { useDispatch, useSelector } from "react-redux";
+
 import { selectUser } from "../../Auth/Services/User.Redux";
 import spotifyApi from "../../../Services/Config/shopify";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
 
 export function usePlaylist() {
+  const dispatch = useDispatch();
   const { id } = useSelector(selectUser);
-  const { playlistData, tracks } = useSelector(selectPlaylist);
+  const { playlistData, tracks, hasError, isUploaded, isLoading } = useSelector(
+    selectPlaylist
+  );
   const exportPlaylist = async () => {
-    // [1] Create playlist
-    if (playlistData) {
-      const { id: playlistID } = await spotifyApi.createPlaylist(id ?? "", {
-        ...playlistData,
-      });
+    dispatch(setIsLoading(true));
+    dispatch(setHasError(false));
+    dispatch(setIsUploaded(false));
 
-      // [2] Save the tracks
+    if (playlistData) {
+      // [1] Create playlist
       spotifyApi
-        .addTracksToPlaylist(
-          playlistID,
-          tracks.map((track) => track.uri)
-        )
-        .then(() => toast("Uploaded playlist to spotify"))
+        .createPlaylist(id ?? "", {
+          ...playlistData,
+        })
+        .then(({ id: playlistID }) => {
+          // [2] Save the tracks
+          spotifyApi
+            .addTracksToPlaylist(
+              playlistID,
+              tracks.map((track) => track.uri)
+            )
+            .then(() => {
+              toast("Uploaded playlist to spotify");
+              dispatch(setIsUploaded(true));
+            })
+            .catch((err) => {
+              console.error(err);
+              toast("We couldnt add the tracks at this time");
+              dispatch(setHasError(true));
+            });
+        })
         .catch((err) => {
           console.error(err);
-          toast("We couldnt add the tracks at this time");
+          toast("We couldnt create a playlist at this time");
+          dispatch(setHasError(true));
+        })
+        .finally(() => {
+          dispatch(setIsLoading(false));
         });
     }
   };
 
-  return { playlistData, tracks, exportPlaylist };
+  return {
+    playlistData,
+    tracks,
+    exportPlaylist,
+    isUploaded,
+    isLoading,
+    hasError,
+    setTrack: (track: SpotifyApi.TrackObjectFull) => dispatch(setTrack(track)),
+    setPlaylistData: (data: IForm) => dispatch(setPlaylistData(data)),
+  };
 }

@@ -1,16 +1,14 @@
 import * as Yup from "yup";
 
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import {
-  setIsAddPlaylistOpen,
-  setPlaylistData,
-} from "../Services/Playlist.Redux";
 
 import { Box } from "../../../Components/Layout/Box";
 import { Button } from "rendition";
 import React from "react";
+import { setIsAddPlaylistOpen } from "../Services/Playlist.Redux";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
+import { usePlaylist } from "../Services/Playlist.hooks";
 
 const Input = styled(Field)`
   display: block;
@@ -24,6 +22,7 @@ const SchemaPlaylist = Yup.object().shape({
 });
 
 export default function FormPlaylist() {
+  const { setPlaylistData } = usePlaylist();
   const dispatch = useDispatch();
 
   return (
@@ -47,12 +46,10 @@ export default function FormPlaylist() {
           initialValues={{ name: "" }}
           validationSchema={SchemaPlaylist}
           onSubmit={(values, { setSubmitting }) => {
-            dispatch(
-              setPlaylistData({
-                ...values,
-                ...{ public: true, description: "" },
-              })
-            );
+            setPlaylistData({
+              ...values,
+              ...{ public: true, description: "" },
+            });
 
             dispatch(setIsAddPlaylistOpen(false));
           }}

@@ -51,6 +51,8 @@
     ]
   },
   "devDependencies": {
-    "@types/spotify-api": "^0.0.3"
+    "@testing-library/react-hooks": "^3.2.1",
+    "@types/spotify-api": "^0.0.3",
+    "react-test-renderer": "^16.13.1"
   }
 }

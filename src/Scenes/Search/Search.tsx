@@ -1,8 +1,6 @@
-import React, { useEffect } from "react";
 import {
   selectPlaylist,
   setIsAddPlaylistOpen,
-  setTrack,
 } from "./Services/Playlist.Redux";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,6 +8,7 @@ import { Box } from "../../Components/Layout/Box";
 import FormPlaylist from "./Components/FormPlaylist";
 import { Input } from "rendition";
 import PlaylistSidebar from "./Components/PlaylistSidebar";
+import React from "react";
 import { selectAuth } from "../Auth/Services/Auth.Redux";
 import { useHistory } from "react-router-dom";
 import { usePlaylist } from "./Services/Playlist.hooks";
@@ -23,15 +22,15 @@ export default function Search() {
     hasError,
     isSearching,
   } = useSearch();
-  const { playlistData } = usePlaylist();
+  const { playlistData, setTrack } = usePlaylist();
   const { isAddPlaylistOpen } = useSelector(selectPlaylist);
   const { token } = useSelector(selectAuth);
   const dispatch = useDispatch();
   const history = useHistory();
 
-  useEffect(() => {
-    if (!token) history.push("/");
-  }, [history, token]);
+  // useEffect(() => {
+  //   if (!token) history.push("/");
+  // }, [history, token]);
 
   return (
     <Box display="flex">
@@ -62,8 +61,9 @@ export default function Search() {
                     if (!playlistData) {
                       dispatch(setIsAddPlaylistOpen(true));
                     }
+                    console.log(track);
 
-                    dispatch(setTrack(track));
+                    setTrack(track);
                   }}
                 >
                   add to playlist
