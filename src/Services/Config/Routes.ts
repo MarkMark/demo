@@ -8,8 +8,9 @@ export const routes = [
     exact: true,
   },
   {
-    path: "/search",
+    path: ["/search"],
     component: Search,
     exact: true,
+    isPrivate: true,
   },
 ];

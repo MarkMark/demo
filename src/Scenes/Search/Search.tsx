@@ -1,8 +1,6 @@
-import React, { useEffect } from "react";
 import {
   selectPlaylist,
   setIsAddPlaylistOpen,
-  setTrack,
 } from "./Services/Playlist.Redux";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,8 +8,7 @@ import { Box } from "../../Components/Layout/Box";
 import FormPlaylist from "./Components/FormPlaylist";
 import { Input } from "rendition";
 import PlaylistSidebar from "./Components/PlaylistSidebar";
-import { selectAuth } from "../Auth/Services/Auth.Redux";
-import { useHistory } from "react-router-dom";
+import React from "react";
 import { usePlaylist } from "./Services/Playlist.hooks";
 import { useSearch } from "./Services/Search.hooks";
 
@@ -23,15 +20,9 @@ export default function Search() {
     hasError,
     isSearching,
   } = useSearch();
-  const { playlistData } = usePlaylist();
+  const { playlistData, setTrack } = usePlaylist();
   const { isAddPlaylistOpen } = useSelector(selectPlaylist);
-  const { token } = useSelector(selectAuth);
   const dispatch = useDispatch();
-  const history = useHistory();
-
-  useEffect(() => {
-    if (!token) history.push("/");
-  }, [history, token]);
 
   return (
     <Box display="flex">
@@ -56,14 +47,11 @@ export default function Search() {
                 justifyContent="space-between"
               >
                 {track.name}
-                {/* TODO: Check that a playlist exists */}
+
                 <button
                   onClick={() => {
-                    if (!playlistData) {
-                      dispatch(setIsAddPlaylistOpen(true));
-                    }
-
-                    dispatch(setTrack(track));
+                    if (!playlistData) dispatch(setIsAddPlaylistOpen(true));
+                    setTrack(track);
                   }}
                 >
                   add to playlist

@@ -3,16 +3,16 @@ import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 
 import App from "./App";
-import { Provider } from "react-redux";
+import { ProviderRedux } from "./Components/Redux/Provider";
 import React from "react";
 import ReactDOM from "react-dom";
 import store from "./Services/Config/Store";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <ProviderRedux store={store}>
       <App />
-    </Provider>
+    </ProviderRedux>
   </React.StrictMode>,
   document.getElementById("root")
 );

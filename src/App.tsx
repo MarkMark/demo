@@ -2,6 +2,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 
+import PrivateRoute from "./Components/Routes/PrivateRoute";
 import { Provider } from "rendition";
 import React from "react";
 import { ToastContainer } from "react-toastify";
@@ -13,7 +14,10 @@ function App() {
       <main>
         <Router>
           <Switch>
-            {routes.map(({ path, ...rest }, i) => {
+            {routes.map(({ path, isPrivate, ...rest }, i) => {
+              if (isPrivate)
+                return <PrivateRoute key={i} {...rest} path={path} />;
+
               return <Route key={i} {...rest} path={path} />;
             })}
           </Switch>

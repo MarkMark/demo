@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { selectAuth, setToken } from "./Auth.Redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { useLocation } from "react-router-dom";
+import { setId } from "./User.Redux";
+import spotifyApi from "../../../Services/Config/spotify";
 
 interface IHashData {
   access_token: string;
@@ -8,28 +10,49 @@ interface IHashData {
   token_type: string;
 }
 
-export function useHash() {
-  const [hashData, setHashData] = useState<IHashData | null>(null);
-  const location = useLocation();
-  const hash = location.hash;
+export function useAuth() {
+  const dispatch = useDispatch();
+  const { token } = useSelector(selectAuth);
 
-  useEffect(() => {
-    if (hash) {
-      const getData = hash
-        .substring(1)
-        .split("&")
-        .reduce((initial: any, item): IHashData => {
-          if (item) {
-            const parts = item.split("=");
-            initial[parts[0]] = decodeURIComponent(parts[1]);
-          }
+  const getHash = (hash: string) => {
+    const getData = hash
+      .substring(1)
+      .split("&")
+      .reduce((initial: any, item): IHashData => {
+        if (item) {
+          const parts = item.split("=");
+          initial[parts[0]] = decodeURIComponent(parts[1]);
+        }
 
-          return initial;
-        }, {});
+        return initial;
+      }, {}) as IHashData;
 
-      setHashData(getData);
-    }
-  }, [hash]);
+    localStorage.setItem("token", getData.access_token);
+    dispatch(setToken(getData.access_token));
+    window.location.hash = "";
+  };
 
-  return { hashData };
+  const setAuth = (token: string) => {
+    spotifyApi.setAccessToken(token);
+
+    spotifyApi
+      .getMe()
+      .then(({ id }) => dispatch(setId(id)))
+      .catch((err) => {
+        console.error(err);
+        localStorage.removeItem("token");
+      });
+  };
+
+  const getStoredToken = () => localStorage.getItem("token");
+  const setStoredToken = (token: string) =>
+    localStorage.setItem("token", token);
+
+  return {
+    token,
+    setAuth: (token: string) => setAuth(token),
+    getToken: (hash: string) => getHash(hash),
+    setStoredToken: (token: string) => setStoredToken(token),
+    getStoredToken,
+  };
 }
