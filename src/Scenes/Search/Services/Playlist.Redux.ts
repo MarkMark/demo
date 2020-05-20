@@ -17,7 +17,7 @@ export interface IForm {
   private?: boolean;
 }
 
-const initialState: IInitialState = {
+export const initialState: IInitialState = {
   playlistData: null,
   tracks: [],
   isAddPlaylistOpen: false,
