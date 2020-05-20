@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import spotifyApi from "../../../Services/Config/spotify";
 import { useDebounce } from "../../../Services/Hooks/useDebounce";
 import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 export function useSearch() {
   const { searchValue, isSearching, tracks, hasError } = useSelector(
@@ -17,6 +18,7 @@ export function useSearch() {
   );
   const debouncedSearchValue = useDebounce(searchValue, 250);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     dispatch(setHasError(false));
@@ -31,13 +33,14 @@ export function useSearch() {
           console.error(err);
           dispatch(setHasError(true));
           localStorage.removeItem("token");
+          history.push("/login");
         })
         .finally(() => dispatch(setIsSearching(false)));
     } else {
       dispatch(setIsSearching(false));
       dispatch(setTracks([]));
     }
-  }, [debouncedSearchValue, dispatch]);
+  }, [debouncedSearchValue, dispatch, history]);
 
   return {
     searchValue,

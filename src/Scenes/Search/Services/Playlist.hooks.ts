@@ -12,9 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../Auth/Services/User.Redux";
 import spotifyApi from "../../../Services/Config/spotify";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 
 export function usePlaylist() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const { id } = useSelector(selectUser);
   const { playlistData, tracks, hasError, isUploaded, isLoading } = useSelector(
     selectPlaylist
@@ -46,6 +48,7 @@ export function usePlaylist() {
               localStorage.removeItem("token");
               toast("We couldnt add the tracks at this time");
               dispatch(setHasError(true));
+              history.push("/login");
             });
         })
         .catch((err) => {
@@ -53,6 +56,7 @@ export function usePlaylist() {
           localStorage.removeItem("token");
           toast("We couldnt create a playlist at this time");
           dispatch(setHasError(true));
+          history.push("/login");
         })
         .finally(() => {
           dispatch(setIsLoading(false));
