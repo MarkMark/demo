@@ -8,8 +8,8 @@ import store from "../../../Services/Config/Store";
 import { trackData } from "../../../MockData/Responses/Track";
 import { useSearch } from "./Search.hooks";
 
-jest.mock("../../../Services/Config/shopify");
-const mockedShopify = spotifyApi as jest.Mocked<typeof spotifyApi>;
+jest.mock("../../../Services/Config/spotify.ts");
+const mockedSpotify = spotifyApi as jest.Mocked<typeof spotifyApi>;
 
 describe("Search for tracks based on entered value", () => {
   const wrapper = ({ children }: any) => (
@@ -25,7 +25,7 @@ describe("Search for tracks based on entered value", () => {
   expect(result.current.hasError).toBeFalsy();
 
   it("should return array of tracks when a value is entered & returns empty array once value is removed", () => {
-    mockedShopify.searchTracks.mockResolvedValueOnce(trackData);
+    mockedSpotify.searchTracks.mockResolvedValueOnce(trackData);
 
     // Search for muse
     act(() => {
@@ -51,7 +51,7 @@ describe("Search for tracks based on entered value", () => {
   });
 
   it("should fail due to being unauthenticated", () => {
-    mockedShopify.searchTracks.mockImplementationOnce(() =>
+    mockedSpotify.searchTracks.mockImplementationOnce(() =>
       Promise.reject(new Error(responseUnauthenticated.error))
     );
 

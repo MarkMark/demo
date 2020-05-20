@@ -10,8 +10,8 @@ import store from "../../../Services/Config/Store";
 import { trackData } from "../../../MockData/Responses/Track";
 import { usePlaylist } from "./Playlist.hooks";
 
-jest.mock("../../../Services/Config/shopify");
-const mockedShopify = spotifyApi as jest.Mocked<typeof spotifyApi>;
+jest.mock("../../../Services/Config/spotify.ts");
+const mockedSpotify = spotifyApi as jest.Mocked<typeof spotifyApi>;
 
 describe("Creation and ability to export local playlist to Spotify", () => {
   const wrapper = ({ children }: any) => (
@@ -50,8 +50,8 @@ describe("Creation and ability to export local playlist to Spotify", () => {
   });
 
   it("should export the local playlist to spotify", () => {
-    mockedShopify.createPlaylist.mockResolvedValueOnce(responsePlaylist);
-    mockedShopify.addTracksToPlaylist.mockResolvedValueOnce(responseTrackAdd);
+    mockedSpotify.createPlaylist.mockResolvedValueOnce(responsePlaylist);
+    mockedSpotify.addTracksToPlaylist.mockResolvedValueOnce(responseTrackAdd);
 
     act(() => {
       result.current.exportPlaylist();
@@ -65,7 +65,7 @@ describe("Creation and ability to export local playlist to Spotify", () => {
   });
 
   it("should fail to create a playlist", () => {
-    mockedShopify.createPlaylist.mockImplementationOnce(() =>
+    mockedSpotify.createPlaylist.mockImplementationOnce(() =>
       Promise.reject(new Error(responseUnauthenticated.error))
     );
 
@@ -82,8 +82,8 @@ describe("Creation and ability to export local playlist to Spotify", () => {
   });
 
   it("should succeed to create a playlist but fail adding a track", () => {
-    mockedShopify.createPlaylist.mockResolvedValueOnce(responsePlaylist);
-    mockedShopify.addTracksToPlaylist.mockImplementationOnce(() =>
+    mockedSpotify.createPlaylist.mockResolvedValueOnce(responsePlaylist);
+    mockedSpotify.addTracksToPlaylist.mockImplementationOnce(() =>
       Promise.reject(new Error(responseUnauthenticated.error))
     );
 
