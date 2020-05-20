@@ -12,8 +12,11 @@ export default function PrivateRoute({
   component: Component,
   ...rest
 }: IPrivateRoute) {
-  const { getStoredToken } = useAuth();
-  const isAuthenticated = !!getStoredToken();
+  const { getStoredToken, setAuth } = useAuth();
+  const token = getStoredToken();
+  const isAuthenticated = !!token;
+
+  if (token) setAuth(token);
 
   return (
     <Route

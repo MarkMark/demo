@@ -1,6 +1,5 @@
 import { selectAuth, setToken } from "./Auth.Redux";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useLocation } from "react-router-dom";
 
 import { setId } from "./User.Redux";
 import spotifyApi from "../../../Services/Config/spotify";
@@ -13,14 +12,9 @@ interface IHashData {
 
 export function useAuth() {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const hash = location.hash;
   const { token } = useSelector(selectAuth);
-  const history = useHistory();
 
   const getHash = (hash: string) => {
-    console.log(hash);
-
     const getData = hash
       .substring(1)
       .split("&")
@@ -33,34 +27,32 @@ export function useAuth() {
         return initial;
       }, {}) as IHashData;
 
-    console.log("getData", getData);
     localStorage.setItem("token", getData.access_token);
     dispatch(setToken(getData.access_token));
-    // window.location.hash = "";
+    window.location.hash = "";
   };
 
-  const storeToken = () => {
-    console.log("hit");
-    if (token) {
-      spotifyApi.setAccessToken(token);
+  const setAuth = (token: string) => {
+    spotifyApi.setAccessToken(token);
 
-      spotifyApi
-        .getMe()
-        .then(({ id }) => {
-          dispatch(setId(id));
-          localStorage.setItem("token", token);
-          history.push("/search");
-        })
-        .catch((err) => console.error(err));
-    }
+    spotifyApi
+      .getMe()
+      .then(({ id }) => dispatch(setId(id)))
+      .catch((err) => {
+        console.error(err);
+        localStorage.removeItem("token");
+      });
   };
 
   const getStoredToken = () => localStorage.getItem("token");
+  const setStoredToken = (token: string) =>
+    localStorage.setItem("token", token);
 
   return {
     token,
+    setAuth: (token: string) => setAuth(token),
     getToken: (hash: string) => getHash(hash),
-    storeToken,
+    setStoredToken: (token: string) => setStoredToken(token),
     getStoredToken,
   };
 }

@@ -7,13 +7,11 @@ import {
 } from "./Search.Redux";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectAuth } from "../../Auth/Services/Auth.Redux";
 import spotifyApi from "../../../Services/Config/spotify";
 import { useDebounce } from "../../../Services/Hooks/useDebounce";
 import { useEffect } from "react";
 
 export function useSearch() {
-  const { token } = useSelector(selectAuth);
   const { searchValue, isSearching, tracks, hasError } = useSelector(
     selectSearch
   );
@@ -32,13 +30,14 @@ export function useSearch() {
         .catch((err) => {
           console.error(err);
           dispatch(setHasError(true));
+          localStorage.removeItem("token");
         })
         .finally(() => dispatch(setIsSearching(false)));
     } else {
       dispatch(setIsSearching(false));
       dispatch(setTracks([]));
     }
-  }, [debouncedSearchValue, dispatch, token]);
+  }, [debouncedSearchValue, dispatch]);
 
   return {
     searchValue,

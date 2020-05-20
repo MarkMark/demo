@@ -43,12 +43,14 @@ export function usePlaylist() {
             })
             .catch((err) => {
               console.error(err);
+              localStorage.removeItem("token");
               toast("We couldnt add the tracks at this time");
               dispatch(setHasError(true));
             });
         })
         .catch((err) => {
           console.error(err);
+          localStorage.removeItem("token");
           toast("We couldnt create a playlist at this time");
           dispatch(setHasError(true));
         })

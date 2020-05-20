@@ -9,8 +9,6 @@ import FormPlaylist from "./Components/FormPlaylist";
 import { Input } from "rendition";
 import PlaylistSidebar from "./Components/PlaylistSidebar";
 import React from "react";
-import { selectAuth } from "../Auth/Services/Auth.Redux";
-import { useHistory } from "react-router-dom";
 import { usePlaylist } from "./Services/Playlist.hooks";
 import { useSearch } from "./Services/Search.hooks";
 
@@ -24,13 +22,7 @@ export default function Search() {
   } = useSearch();
   const { playlistData, setTrack } = usePlaylist();
   const { isAddPlaylistOpen } = useSelector(selectPlaylist);
-  const { token } = useSelector(selectAuth);
   const dispatch = useDispatch();
-  const history = useHistory();
-
-  // useEffect(() => {
-  //   if (!token) history.push("/");
-  // }, [history, token]);
 
   return (
     <Box display="flex">
@@ -55,14 +47,10 @@ export default function Search() {
                 justifyContent="space-between"
               >
                 {track.name}
-                {/* TODO: Check that a playlist exists */}
+
                 <button
                   onClick={() => {
-                    if (!playlistData) {
-                      dispatch(setIsAddPlaylistOpen(true));
-                    }
-                    console.log(track);
-
+                    if (!playlistData) dispatch(setIsAddPlaylistOpen(true));
                     setTrack(track);
                   }}
                 >
