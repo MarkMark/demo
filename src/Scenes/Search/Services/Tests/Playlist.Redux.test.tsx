@@ -6,9 +6,9 @@ import reducer, {
   setIsUploaded,
   setPlaylistData,
   setTrack,
-} from "./Playlist.Redux";
+} from "../Playlist.Redux";
 
-import { trackData } from "../../../MockData/Responses/Track";
+import { trackData } from "../../../../MockData/Responses/Track";
 
 describe("auth slice", () => {
   describe("reducer, actions and selectors", () => {

@@ -1,16 +1,16 @@
 import { act, renderHook } from "@testing-library/react-hooks";
 
-import { ProviderRedux } from "../../../Components/Redux/Provider";
+import { ProviderRedux } from "../../../../Components/Redux/Provider";
 import React from "react";
-import { responsePlaylist } from "../../../MockData/Responses/Playlist";
-import { responseTrackAdd } from "../../../MockData/Responses/TrackAdd";
-import { responseUnauthenticated } from "../../../MockData/Responses/Unauthenticated";
-import spotifyApi from "../../../Services/Config/spotify";
-import store from "../../../Services/Config/Store";
-import { trackData } from "../../../MockData/Responses/Track";
-import { usePlaylist } from "./Playlist.hooks";
+import { responsePlaylist } from "../../../../MockData/Responses/Playlist";
+import { responseTrackAdd } from "../../../../MockData/Responses/TrackAdd";
+import { responseUnauthenticated } from "../../../../MockData/Responses/Unauthenticated";
+import spotifyApi from "../../../../Services/Config/spotify";
+import store from "../../../../Services/Config/Store";
+import { trackData } from "../../../../MockData/Responses/Track";
+import { usePlaylist } from "../Playlist.hooks";
 
-jest.mock("../../../Services/Config/spotify.ts");
+jest.mock("../../../../Services/Config/spotify.ts");
 const mockedSpotify = spotifyApi as jest.Mocked<typeof spotifyApi>;
 
 describe("Creation and ability to export local playlist to Spotify", () => {

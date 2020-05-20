@@ -1,14 +1,14 @@
 import { act, renderHook } from "@testing-library/react-hooks";
 
-import { ProviderRedux } from "../../../Components/Redux/Provider";
+import { ProviderRedux } from "../../../../Components/Redux/Provider";
 import React from "react";
-import { responseUnauthenticated } from "../../../MockData/Responses/Unauthenticated";
-import spotifyApi from "../../../Services/Config/spotify";
-import store from "../../../Services/Config/Store";
-import { trackData } from "../../../MockData/Responses/Track";
-import { useSearch } from "./Search.hooks";
+import { responseUnauthenticated } from "../../../../MockData/Responses/Unauthenticated";
+import spotifyApi from "../../../../Services/Config/spotify";
+import store from "../../../../Services/Config/Store";
+import { trackData } from "../../../../MockData/Responses/Track";
+import { useSearch } from "../Search.hooks";
 
-jest.mock("../../../Services/Config/spotify.ts");
+jest.mock("../../../../Services/Config/spotify.ts");
 const mockedSpotify = spotifyApi as jest.Mocked<typeof spotifyApi>;
 
 describe("Search for tracks based on entered value", () => {
